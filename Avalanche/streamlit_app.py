@@ -14,12 +14,27 @@ def get_response(user_prompt, temperature):
         max_tokens=100  # Limit response length
         )
     return response
+import os
+import streamlit as st
+
+def get_openai_api_key():
+    # Prioritize Streamlit secrets if available
+    if "OPENAI_API_KEY" in st.secrets:
+        return st.secrets["OPENAI_API_KEY"]
+    
+    # Fallback to local environment variable
+    api_key = os.getenv("OPENAI_API_KEY")
+    if api_key:
+        return api_key
+
+    # Final fallback: raise error
+    raise ValueError("OpenAI API key not found in Streamlit secrets or environment variables.")
 
 # Load environment variables from .env file
 load_dotenv()
 
 # Access the API key from the environment
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = get_openai_api_key()
 
 # Initialize the OpenAI client
 client = OpenAI(api_key=api_key)
